@@ -51,7 +51,6 @@ app.delete('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
-  const existingName = persons.filter(p => p.name.toLowerCase() === body.name.toLowerCase())
 
   if (!body.name) {
     return response.status(400).json({
@@ -61,21 +60,16 @@ app.post('/api/persons', (request, response) => {
     return response.status(400).json({
       error: 'number must be entered'
     })
-  } else if (existingName.length > 0) {
-    return response.status(400).json({
-      error: 'name already exists'
-    })
   } else {
-  const id = Math.floor(Math.random() * 100000)
-  const person = {
-    id,
-    name: body.name,
-    number: body.number
-  }
-  
-  persons = persons.concat(person)
-  response.json(person)
-  }
+		const person = new Person({
+			name: body.name,
+			number: body.number
+		})
+
+		person.save().then(savedPerson => {
+			response.json(savedPerson)
+		})
+	}
 })
 
 const PORT = process.env.PORT
